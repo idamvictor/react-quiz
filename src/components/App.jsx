@@ -33,8 +33,24 @@ function reducer(state, action) {
     case "dataFailed":
       return { ...state, status: "error" };
     case "start":
-      return { ...state, status: "active", secondsRemaining: state.questions.length * SECS_PER_QUESTION };
-    case "newAnswer":
+      return {
+        ...state,
+        status: "active",
+        secondsRemaining: state.questions.length * SECS_PER_QUESTION,
+      };
+    // case "newAnswer":
+    //   const question = state.questions.at(state.index);
+
+    //   return {
+    //     ...state,
+    //     answer: action.payload,
+    //     points:
+    //       action.payload === question.correctOption
+    //         ? state.points + question.points
+    //         : state.points,
+    //   };
+
+    case "newAnswer": {
       const question = state.questions.at(state.index);
 
       return {
@@ -45,6 +61,7 @@ function reducer(state, action) {
             ? state.points + question.points
             : state.points,
       };
+    }
     case "nextQuestion":
       return { ...state, index: state.index + 1, answer: null };
     case "finish":
@@ -57,7 +74,11 @@ function reducer(state, action) {
     case "restart":
       return { ...initialState, question: state.questions, status: "ready" };
     case "tick":
-      return { ...state, secondsRemaining: state.secondsRemaining - 1, status: state.secondsRemaining === 0 ? "finished" : state.status };
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+        status: state.secondsRemaining === 0 ? "finished" : state.status,
+      };
     default:
       throw new Error("Action Unknown");
   }
@@ -79,6 +100,7 @@ function App() {
     fetch(`http://localhost:8000/questions`)
       .then((res) => res.json())
       .then((data) => dispatch({ type: "dataReceived", payload: data }))
+      // eslint-disable-next-line
       .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
 
